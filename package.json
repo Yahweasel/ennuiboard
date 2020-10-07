@@ -1,0 +1,26 @@
+{
+  "name": "ennuiboard",
+  "version": "1.0.0",
+  "description": "A JavaScript library to convert web Gamepad and MIDI events into keyboard events",
+  "main": "ennuiboard.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yahweasel/ennuiboard.git"
+  },
+  "keywords": [
+    "gamepad",
+    "midi",
+    "keyboard",
+    "web",
+    "dom"
+  ],
+  "author": "Yahweasel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yahweasel/ennuiboard/issues"
+  },
+  "homepage": "https://github.com/Yahweasel/ennuiboard#readme"
+}

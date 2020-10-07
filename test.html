@@ -1,0 +1,59 @@
+<!doctype html>
+<!--
+ * Copyright (c) 2020 Yahweasel
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+ * OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+-->
+<html>
+    <body>
+        <div id="log"></div>
+        <script type="text/javascript" src="ennuiboard.js"></script>
+        <script type="text/javascript">(function() {
+            var eb = Ennuiboard;
+            var log = document.getElementById("log");
+
+            Object.keys(eb.supported).sort().forEach(function(t) {
+                if (t === "any" || !eb.supported[t]) return;
+                if (!eb.enabled[t] && !eb.enabling[t]) {
+                    var b = document.createElement("button");
+                    b.innerHTML = t;
+                    b.onclick = function() {
+                        b.disabled = true;
+                        eb.enable(t, {auto: true});
+                    };
+                    document.body.appendChild(b);
+
+                } else {
+                    var b = document.createElement("button");
+                    b.innerHTML = "Disable " + t;
+                    b.onclick = function() {
+                        b.disabled = true;
+                        eb.disable(t);
+                    };
+                    document.body.appendChild(b);
+
+                }
+            });
+
+            function handler(ev) {
+                var div = document.createElement("div");
+                div.innerText = ev.type + ": " + ev.key;
+                log.appendChild(div);
+                window.scroll(0, 2000000000);
+            }
+
+            document.body.addEventListener("keydown", handler);
+            document.body.addEventListener("keyup", handler);
+        })();</script>
+    </body>
+</html>
