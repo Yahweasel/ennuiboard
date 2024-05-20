@@ -1,9 +1,16 @@
 {
   "name": "ennuiboard",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A JavaScript library to convert web Gamepad and MIDI events into keyboard events",
-  "main": "ennuiboard.min.js",
+  "main": "dist/ennuiboard.js",
+  "types": "src/ennuiboard.ts",
+  "exports": {
+    "import": "./dist/ennuiboard.mjs",
+    "default": "./dist/ennuiboard.js"
+  },
   "scripts": {
+    "build": "tsc && rollup -c",
+    "clean": "make clean",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,5 +29,10 @@
   "bugs": {
     "url": "https://github.com/Yahweasel/ennuiboard/issues"
   },
-  "homepage": "https://github.com/Yahweasel/ennuiboard#readme"
+  "homepage": "https://github.com/Yahweasel/ennuiboard#readme",
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.17.2",
+    "typescript": "^5.4.5"
+  }
 }

@@ -1,7 +1,10 @@
-MINIFIER=closure-compiler --language_in=ECMASCRIPT5
-#MINIFIER=cat
+all: dist/ennuiboard.min.js
 
-all: ennuiboard.min.js
+dist/ennuiboard.min.js: node_modules/.bin/tsc
+	npm run build
 
-ennuiboard.min.js: ennuiboard.js
-	cat $< | $(MINIFIER) | cat license.js - > $@
+node_modules/.bin/tsc:
+	npm install
+
+clean:
+	rm -rf dist/ src/*.js
