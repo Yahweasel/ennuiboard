@@ -2,11 +2,11 @@
   "name": "ennuiboard",
   "version": "2.0.0",
   "description": "A JavaScript library to convert web Gamepad and MIDI events into keyboard events",
-  "main": "dist/ennuiboard.js",
+  "main": "dist/ennuiboard.umd.js",
   "types": "src/ennuiboard.ts",
   "exports": {
     "import": "./dist/ennuiboard.mjs",
-    "default": "./dist/ennuiboard.js"
+    "default": "./dist/ennuiboard.umd.js"
   },
   "scripts": {
     "build": "tsc && rollup -c",

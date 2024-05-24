@@ -22,7 +22,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const eb = {
+const Ennuiboard = {
     subsystems: {},
     supported: {
         any: false
@@ -31,7 +31,7 @@ const eb = {
         any: false
     },
     enabling: {},
-    requiresPermissions: {},
+    requiresPermission: {},
     /**
      * Enable this subsystem.
      */
@@ -53,6 +53,7 @@ const eb = {
                     auto[t] = opts;
                     localStorage.setItem("eb-auto", JSON.stringify(auto));
                 }
+                return true;
             }))();
             return p;
         });
@@ -86,82 +87,76 @@ function dispatchKey(du, key) {
     (document.activeElement || document.body).dispatchEvent(ev);
 }
 // Gamepad support
-eb.subsystems.gamepad = {
-    requiresPermissions: false,
+const GamepadSubsystem = {
+    requiresPermission: false,
     supported: function () {
-        return !!(navigator.getGamepads || navigator.webkitGetGamepads);
+        return !!navigator.getGamepads;
     },
     enable: function (opts = {}) {
-        if (navigator.getGamepads) {
-            this._getGamepads = navigator.getGamepads.bind(navigator);
-            this._queryButton = this._standardQueryButton;
-        }
-        else {
-            this._getGamepads = navigator.webkitGetGamepads.bind(navigator);
-            this._queryButton = this._webkitQueryButton;
-        }
         if (!opts.manualPoll)
             this._interval = setInterval(this.poll.bind(this), 50);
-        eb.enabled.gamepad = eb.enabled.any = true;
+        Ennuiboard.enabled.gamepad = Ennuiboard.enabled.any = true;
         return Promise.resolve(true);
     },
-    _state: {},
+    _interval: 0,
+    _bstate: {},
+    _astate: {},
     // Gamepads are poll-based, so call this to check for events
     poll: function () {
-        let pads = this._getGamepads();
+        let pads = navigator.getGamepads();
         for (let pi = 0; pi < pads.length; pi++) {
             let pad = pads[pi];
             if (!pad)
                 continue;
-            if (!(pad.id in this._state))
-                this._state[pad.id] = {};
-            let state = this._state[pad.id];
+            if (!(pad.id in this._bstate)) {
+                this._bstate[pad.id] = {};
+                this._astate[pad.id] = {};
+            }
+            const bstate = this._bstate[pad.id];
+            const astate = this._astate[pad.id];
             // Query buttons
             for (let bi = 0; bi < pad.buttons.length; bi++) {
                 const bis = "b" + bi;
-                if (!(bis in state))
-                    state[bis] = false;
+                if (!(bis in bstate))
+                    bstate[bis] = false;
                 const newState = this._queryButton(pad.buttons[bi]);
-                if (newState !== state[bis]) {
+                if (newState !== bstate[bis]) {
                     // Send an event
                     dispatchKey(newState ? "down" : "up", "eb:gamepad:" + pad.id + ":" + bis);
-                    state[bis] = newState;
+                    bstate[bis] = newState;
                 }
             }
             // And axes
             for (let ai = 0; ai < pad.axes.length; ai++) {
                 const ais = "a" + ai;
-                if (!(ais in state))
-                    state[ais] = 0;
+                if (!(ais in astate))
+                    astate[ais] = 0;
                 const newState = ~~Math.round(pad.axes[ai]);
-                if (newState !== state[ais]) {
+                if (newState !== astate[ais]) {
                     // Two phases in case we jumped all the way
                     const key = "eb:gamepad:" + pad.id + ":" + ais;
-                    if (state[ais]) {
-                        const ukey = key + (state[ais] > 0 ? "+" : "-");
+                    if (astate[ais]) {
+                        const ukey = key + (astate[ais] > 0 ? "+" : "-");
                         dispatchKey("up", ukey);
                     }
                     if (newState) {
                         const dkey = key + (newState > 0 ? "+" : "-");
                         dispatchKey("down", dkey);
                     }
-                    state[ais] = newState;
+                    astate[ais] = newState;
                 }
             }
         }
     },
     // Query a button using the standard interface
-    _standardQueryButton: function (b) {
+    _queryButton: function (b) {
         return (b.value > 0 || b.pressed);
-    },
-    // Query a button using the old interface
-    _webkitQueryButtons: function (b) {
-        return b > 0;
     }
 };
+Ennuiboard.subsystems.gamepad = GamepadSubsystem;
 // MIDI input
-eb.subsystems.midi = {
-    requiresPermissions: true,
+const MIDISubsystem = {
+    requiresPermission: true,
     supported: function () {
         return !!(navigator.requestMIDIAccess);
     },
@@ -202,13 +197,15 @@ eb.subsystems.midi = {
                 return false;
             }
         });
-    }
+    },
+    poll: function () { }
 };
+Ennuiboard.subsystems.midi = MIDISubsystem;
 // Set up support information
 for (const t of ["gamepad", "midi"]) {
-    if (eb.supported[t] = eb.subsystems[t].supported())
-        eb.supported.any = true;
-    eb.requiresPermissions[t] = eb.subsystems[t].requiresPermission;
+    if (Ennuiboard.supported[t] = Ennuiboard.subsystems[t].supported())
+        Ennuiboard.supported.any = true;
+    Ennuiboard.requiresPermission[t] = Ennuiboard.subsystems[t].requiresPermission;
 }
 // And autoload
 if (typeof localStorage !== "undefined") {
@@ -218,8 +215,8 @@ if (typeof localStorage !== "undefined") {
     const auto = JSON.parse(autoStr);
     for (const t of Object.keys(auto).sort()) {
         if (auto[t])
-            eb.enable(t, auto[t]);
+            Ennuiboard.enable(t, auto[t]);
     }
 }
 
-export { eb as default };
+export { Ennuiboard };

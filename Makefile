@@ -1,6 +1,6 @@
 all: dist/ennuiboard.min.js
 
-dist/ennuiboard.min.js: node_modules/.bin/tsc
+dist/ennuiboard.min.js: src/* node_modules/.bin/tsc
 	npm run build
 
 node_modules/.bin/tsc:
